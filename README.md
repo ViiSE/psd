@@ -1,5 +1,5 @@
 # psd
-Simple python scheduler for one task.
+Simple python script scheduler for one task.
 
 Usage
 -----
