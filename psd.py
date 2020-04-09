@@ -25,7 +25,7 @@ print("[ Job: " + job_prg + " ]")
 print("[ Start time: " + str(start_hour) + ":" + str(start_minutes) + " ]")
 print("[ Stop time:  " + str(stop_hour) + ":" + str(stop_minutes) + " ]")
 print("[ Repeat every " + str(day_count) + " days ]")
-print("[ Print to shell: " + str(isShell) + " ]")
+print("[ Through the shell: " + str(isShell) + " ]")
 print("[ Waiting for job starting... ]")
 
 while True:
