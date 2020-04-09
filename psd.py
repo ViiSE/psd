@@ -42,7 +42,7 @@ while True:
             subprocess.call(['taskkill', '/F', '/T', '/PID',  str(job.pid)])
         else:
             job.kill()
-        print("[ Job stopped at + " + str(now) + " ]")
+        print("[ Job finished at + " + str(now) + " ]")
         # Calculate new stop date
         next_stop_day_job = datetime.date.today() + timedelta(days=day_count)
         stop_date_time = datetime.datetime.combine(next_stop_day_job, datetime.time(stop_hour, stop_minutes, 0))
