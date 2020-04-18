@@ -1,0 +1,47 @@
+{
+  "jobs": [
+    {
+      "name": "ping1",
+      "cmd": "ping 8.8.8.8",
+      "schedule": {
+        "start": {
+          "time": "18:40",
+          "day": 1
+        },
+        "finish": {
+          "time": "18:41"
+        }
+      }
+    },
+    {
+      "name": "ping2",
+      "schedule": {
+        "start": {
+          "time": "now"
+        },
+        "finish": {
+          "time": "never"
+        }
+      },
+      "cmd": "ping 8.8.8.8"
+    },
+    {
+      "name": "ls",
+      "cmd": "ls",
+      "schedule": {
+        "start": {
+          "time": "18:00",
+          "day": 1
+        },
+        "finish": {
+          "time": "18:50",
+          "day": 2
+        }
+      },
+      "repeat": {
+        "unit": "m",
+        "val": 1
+      }
+    }
+  ]
+}
