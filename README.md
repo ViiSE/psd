@@ -21,6 +21,7 @@ This file contains all about jobs. Place in the same directory as psd.py.<br>
 File contents:
 ```json
 {
+  "is_shell": true,
   "jobs": [
     {
       "name": "ping1",

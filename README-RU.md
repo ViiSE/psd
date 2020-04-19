@@ -21,6 +21,7 @@ psd.json
 Содержимое файла:
 ```json
 {
+  "is_shell": true,
   "jobs": [
     {
       "name": "ping1",
