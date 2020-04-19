@@ -1,4 +1,5 @@
 {
+  "is_shell": true,
   "jobs": [
     {
       "name": "ping1",
@@ -41,6 +42,20 @@
       "repeat": {
         "unit": "m",
         "val": 1
+      }
+    },
+    {
+      "name": "ls_2",
+      "cmd": "ls",
+      "schedule": {
+        "start": {
+          "time": "18:00",
+          "day": "mon"
+        },
+        "finish": {
+          "time": "18:50",
+          "day": "wed"
+        }
       }
     }
   ]
