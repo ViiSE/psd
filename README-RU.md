@@ -22,17 +22,18 @@ psd.json
 ```json
 {
   "is_shell": true,
+  "wait_repeated_jobs": true,
   "jobs": [
     {
       "name": "ping1",
       "cmd": "ping 8.8.8.8",
       "schedule": {
         "start": {
-          "time": "18:39",
+          "time": "13:48",
           "day": 1
         },
         "finish": {
-          "time": "18:40"
+          "time": "18:41"
         }
       }
     },
@@ -63,7 +64,8 @@ psd.json
       },
       "repeat": {
         "unit": "m",
-        "val": 1
+        "val": 1,
+        "wait_finished": true
       }
     },
     {
@@ -79,6 +81,9 @@ psd.json
           "day": "wed"
         }
       }
+    },
+    {
+      "file": "whoami.json"
     }
   ]
 }
@@ -88,6 +93,9 @@ psd.json
 <code>*</code> - обязательное поле.
 - <code>"is_shell"</code>: запуск через оболочку или нет [(что это?)](https://docs.python.org/3/library/subprocess.html#frequently-used-arguments).
                            Значение по умолчанию - <code>true</code>.
+- <code>*"wait_repeated_jobs"</code>: ждать заверешения повторяющейся задачи или нет, когда psd получает SIGINT сигнал 
+                                      (например, ctrl+C). <code>true</code> - ждать, <code>false</code> - завершить psd
+                                      немедленно.
 - <code>*"jobs"</code>: список задач:
     - <code>*"name"</code>: имя задачи;
     - <code>*"cmd"</code>: команда задачи;
@@ -115,8 +123,42 @@ psd.json
             2) <code>"m"</code> - минуты;
             3) <code>"h"</code> - часы.
         - <code>"val"</code> - значение времени повторения задачи.
+        - <code>"wait_finished"</code> - ждать завершение задачи перед тем, как ее повторить. Если <code>true</code>, то
+                                         задача повторится после того, как она завершится, с учетом времени повторения. 
+                                         Если <code>false</code>, то задача повторится после времени повторения.
 
-# Значения дней недели
+## Задача в файле
+Задачи могут быть определены в отдельных файлах. Для этого определите задачу в списке задач (jobs) как:
+```json
+{
+  "file": "whoami.json"
+}
+```
+Файл whoami.json:
+```json
+{
+  "cmd": "whoami",
+  "schedule": {
+    "start": {
+      "time": "12:00",
+      "day": 1
+    },
+    "finish": {
+      "time": "18:50",
+      "day": "wed"
+    }
+  },
+  "repeat": {
+    "unit": "s",
+    "val": 10,
+    "wait_finished": false
+  }
+}
+```
+Вы можете проигнорировать поле <code>"name"</code> в файле задачи. В этом случае имя задачи будет именем файла без 
+расширения. 
+
+## Значения дней недели
 1) <code>"mon"</code> - Понедельник;
 2) <code>"tue"</code> - Вторник;
 3) <code>"wed"</code> - Среда;

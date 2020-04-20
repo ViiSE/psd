@@ -21,6 +21,7 @@ import subprocess
 import sys
 import time
 from datetime import timedelta
+from os import path
 
 DOW = {"mon": 0, "tue": 1, "wed": 2, "thu": 3,  "fri": 4, "sat": 5, "sun": 6}
 
@@ -160,6 +161,8 @@ class JobRep:
         self.start_datetime = None
         self.repeat = repeat
         self.is_start = False
+        self.is_stop = False
+        self.job = None
         self.next_repeat = None
         self.start_datetime = None
         self.stop_datetime = None
@@ -207,17 +210,19 @@ class JobRep:
                     datetime.time(stop_h_m[0], stop_h_m[1], 0))
 
     def try_start(self):  # True - job is running, False - job is not running
+        if self.is_stop:
+            return False
         if self.is_start:
             return True
         elif self.schedule["start"]["time"] == "now":
             self.is_start = True
-            subprocess.Popen(self.cmd, shell=self.is_shell)
+            self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
             print("[ Job '" + str(self.name) + "' started at " + str(datetime.datetime.now()) + " ]")
             return True
         else:
             now = datetime.datetime.now()
             if self.start_datetime <= now <= self.stop_datetime:
-                subprocess.Popen(self.cmd, shell=self.is_shell)
+                self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
                 self.is_start = True
                 self.next_repeat = calc_repeat(now, self.repeat)
                 start_h_m = int_time(self.schedule["start"]["time"])
@@ -239,6 +244,8 @@ class JobRep:
                 return False
 
     def try_stop(self):  # true - job is finished, false - job is not finished
+        if self.is_stop:
+            return True
         if self.schedule["finish"]["time"] == "never":
             return False
         else:
@@ -268,10 +275,31 @@ class JobRep:
                 return False
 
     def try_repeat(self):
-        now = datetime.datetime.now()
-        if now > self.next_repeat:
-            subprocess.Popen(self.cmd, shell=self.is_shell)
-            self.next_repeat = calc_repeat(now, self.repeat)
+        if not self.is_stop:
+            now = datetime.datetime.now()
+            if now > self.next_repeat:
+                if self.repeat["wait_finished"]:
+                    if self.job is None:
+                        self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
+                        self.next_repeat = calc_repeat(now, self.repeat)
+                    elif self.job.poll() is not None:  # if process is terminated
+                        self.next_repeat = calc_repeat(now, self.repeat)
+                        self.job = None
+                else:
+                    self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
+                    self.next_repeat = calc_repeat(now, self.repeat)
+
+    def try_stop_immediately(self):
+        if not self.is_start:
+            self.is_stop = True
+
+        if not self.is_stop:
+            if self.job is None:
+                self.is_stop = True
+                print("[ Job '" + self.name + "' finished at " + str(datetime.datetime.now()) + " ]")
+            elif self.job.poll() is not None:  # if process is terminated
+                self.is_stop = True
+                print("[ Job '" + self.name + "' finished at " + str(datetime.datetime.now()) + " ]")
 
 
 def calc_repeat(dt, repeat):
@@ -327,6 +355,26 @@ def sigint_handler(signum, frame):
     for _j in jobs:
         _j.stop_immediately()
     print()
+    if wait_rep_jobs:
+        print("Wait repeated jobs finished...")
+        is_run = True
+        stop_j = [False] * len(jobs_r)
+        while is_run:
+            i = 0
+            for _jr in jobs_r:
+                _jr.try_stop_immediately()
+                if _jr.is_stop:
+                    stop_j[i] = True
+                i += 1
+            stop_count = 0
+            for s_j in stop_j:
+                if s_j is True:
+                    stop_count += 1
+            if stop_count == len(stop_j):
+                is_run = False
+                continue
+            time.sleep(1)
+        print()
     exit(1)
 
 
@@ -343,10 +391,22 @@ if "is_shell" not in settings:
     is_shell = True
 else:
     is_shell = settings["is_shell"]
+if "wait_repeated_jobs" not in settings:
+    error("Field 'wait_repeated_jobs' not found in " + str(f_name) + "!")
+else:
+    wait_rep_jobs = settings["wait_repeated_jobs"]
 
 for js in settings["jobs"]:
+    js_f_name = None
+    if "file" in js:
+        js_f_name = path.splitext(js["file"])[0]
+        js = json.load(open(js["file"]))
+
     if "name" not in js:
-        error("Field 'name' is not found in job!")
+        if js_f_name is not None:
+            js["name"] = js_f_name
+        else:
+            error("Field 'name' is not found in job!")
     if "cmd" not in js:
         error("Field 'cmd' is not found in job!\nJob name: " + js["name"])
     if "schedule" not in js:
@@ -383,11 +443,14 @@ for js in settings["jobs"]:
         if js["schedule"]["finish"]["time"] != "never":
             error("Field 'time' has wrong pattern! Expected ##:##, actual " + str(js["schedule"]["finish"]["time"])
                   + "\nJob name: " + js["name"])
+
     if "repeat" in js:
         if "unit" not in js["repeat"]:
             error("Field 'unit' is not found in job{repeat}!\nJob name: " + js["name"])
         if "val" not in js["repeat"]:
             error("Field 'val' is not found in job{repeat}!\nJob name: " + js["name"])
+        if "wait_finished" not in js["repeat"]:
+            error("Field 'wait_finished' is not found in job{repeat}!\nJob name: " + js["name"])
 
         jobs_r.append(JobRep(
             js["name"],

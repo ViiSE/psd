@@ -22,17 +22,18 @@ File contents:
 ```json
 {
   "is_shell": true,
+  "wait_repeated_jobs": true,
   "jobs": [
     {
       "name": "ping1",
       "cmd": "ping 8.8.8.8",
       "schedule": {
         "start": {
-          "time": "18:39",
+          "time": "13:48",
           "day": 1
         },
         "finish": {
-          "time": "18:40"
+          "time": "18:41"
         }
       }
     },
@@ -63,7 +64,8 @@ File contents:
       },
       "repeat": {
         "unit": "m",
-        "val": 1
+        "val": 1,
+        "wait_finished": true
       }
     },
     {
@@ -79,6 +81,9 @@ File contents:
           "day": "wed"
         }
       }
+    },
+    {
+      "file": "whoami.json"
     }
   ]
 }
@@ -88,6 +93,9 @@ Fields description:<br>
 <code>*</code> - field required.
 - <code>"is_shell"</code>: through the shell or not [(what is it?)](https://docs.python.org/3/library/subprocess.html#frequently-used-arguments).
                            Default value - <code>true</code>.
+- <code>*"wait_repeated_jobs"</code>: wait to completing repeated jobs or not if psd get SIGINT signal 
+                                      (ctrl+C, for example). <code>true</code> - wait, <code>false</code> - finished psd
+                                      immediately.
 - <code>*"jobs"</code>: the list that contains jobs:
     - <code>*"name"</code>: job name;
     - <code>*"cmd"</code>: command for job;
@@ -113,8 +121,41 @@ Fields description:<br>
             2) <code>"m"</code> - minutes;
             3) <code>"h"</code> - hours.
         - <code>"val"</code> - repeat time value.
+        - <code>"wait_finished"</code> - wait to finished job before as repeating job. If <code>true</code>, then job is
+                                         repeat after job finished, plus repeat time value. If <code>false</code>, then
+                                         repeat after repeat time value.
 
-# Days of week values
+## Job in file
+Jobs can be defined in separate files. To do this, define the job in the jobs list as:
+```json
+{
+  "file": "whoami.json"
+}
+```
+File whoami.json:
+```json
+{
+  "cmd": "whoami",
+  "schedule": {
+    "start": {
+      "time": "12:00",
+      "day": 1
+    },
+    "finish": {
+      "time": "18:50",
+      "day": "wed"
+    }
+  },
+  "repeat": {
+    "unit": "s",
+    "val": 10,
+    "wait_finished": false
+  }
+}
+```
+You can ignore field <code>"name"</code> in job file. In this case, job will have a name as file without extension.
+
+## Days of week values
 1) <code>"mon"</code> - Monday;
 2) <code>"tue"</code> - Tuesday;
 3) <code>"wed"</code> - Wednesday;

@@ -1,0 +1,18 @@
+{
+  "cmd": "whoami",
+  "schedule": {
+    "start": {
+      "time": "12:00",
+      "day": 1
+    },
+    "finish": {
+      "time": "18:50",
+      "day": "wed"
+    }
+  },
+  "repeat": {
+    "unit": "s",
+    "val": 10,
+    "wait_finished": false
+  }
+}
