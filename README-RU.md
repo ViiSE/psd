@@ -93,7 +93,7 @@ psd.json
 <code>*</code> - обязательное поле.
 - <code>"is_shell"</code>: запуск через оболочку или нет [(что это?)](https://docs.python.org/3/library/subprocess.html#frequently-used-arguments).
                            Значение по умолчанию - <code>true</code>.
-- <code>*"wait_repeated_jobs"</code>: ждать заверешения повторяющейся задачи или нет, когда psd получает SIGINT сигнал 
+- <code>*"wait_repeated_jobs"</code>: ждать завершения повторяющейся задачи или нет, когда psd получает SIGINT сигнал 
                                       (например, ctrl+C). <code>true</code> - ждать, <code>false</code> - завершить psd
                                       немедленно.
 - <code>*"jobs"</code>: список задач:
