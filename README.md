@@ -1,4 +1,4 @@
-# <img src=https://user-images.githubusercontent.com/43209824/80061019-63c7e780-8573-11ea-8814-9ec28d1641e9.png width="64" height="64"/> psd
+# <img src=psd_logo.png="64" height="64"/> psd
 Simple python script scheduler.
 
 Usage
