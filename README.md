@@ -1,4 +1,4 @@
-# <img src=psd_logo.png="64" height="64"/> psd
+# <img src=psd_logo.png weight="64" height="64"/> psd
 Simple python script scheduler.
 
 Usage
