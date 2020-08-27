@@ -1,4 +1,4 @@
-# psd
+# <img src=psd_logo.png weight="64" height="64"/> psd
 Простой планировщик заданий на python.
 
 Использование
