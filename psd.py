@@ -127,6 +127,10 @@ class Job:
                                                  day=dt_start.day,
                                                  hour=stop_h_m[0],
                                                  minute=stop_h_m[1])
+
+            if dt_actual_start > dt_actual_finish:
+                dt_actual_finish += timedelta(days=1)
+
             if not(dt_actual_start < dt_start < dt_actual_finish):
                 dt_start += timedelta(days=1)
 
@@ -402,12 +406,6 @@ class JobRep:
                 else:
                     start_h_m = int_time(self.schedule["start"]["time"])
 
-            dt_start = datetime.datetime.today()
-            dt_actual_start = datetime.datetime(year=dt_start.year,
-                                                month=dt_start.month,
-                                                day=dt_start.day,
-                                                hour=start_h_m[0],
-                                                minute=start_h_m[1])
             if "month" in self.schedule["finish"]:
                 stop_h_m = int_time(self.schedule["finish"]["month"]["time"])
             else:
@@ -422,11 +420,15 @@ class JobRep:
                                                 day=dt_start.day,
                                                 hour=start_h_m[0],
                                                 minute=start_h_m[1])
+
             dt_actual_finish = datetime.datetime(year=dt_start.year,
                                                  month=dt_start.month,
                                                  day=dt_start.day,
                                                  hour=stop_h_m[0],
                                                  minute=stop_h_m[1])
+            if dt_actual_start > dt_actual_finish:
+                dt_actual_finish += timedelta(days=1)
+
             if not (dt_actual_start < dt_start < dt_actual_finish):
                 dt_start += timedelta(days=1)
 
