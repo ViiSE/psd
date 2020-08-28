@@ -165,7 +165,23 @@ class Job:
         if self.start_datetime is None:
             dt_start = datetime.date.today()
         else:
+            if "month" in self.schedule["finish"]:
+                stop_h_m = int_time(self.schedule["finish"]["month"]["time"])
+            else:
+                if self.schedule["finish"]["time"] == "never":
+                    stop_h_m = [0, 0]
+                else:
+                    stop_h_m = int_time(self.schedule["finish"]["time"])
+
             dt_start = self.start_datetime
+            dt_actual_finish = datetime.datetime(year=dt_start.year,
+                                                 month=dt_start.month,
+                                                 day=dt_start.day,
+                                                 hour=stop_h_m[0],
+                                                 minute=stop_h_m[1])
+
+            if dt_start > dt_actual_finish:
+                dt_start += timedelta(days=1)
 
         if "month" in self.schedule["finish"]:
             if isinstance(self.schedule["finish"]["month"]["values"], str):
@@ -462,7 +478,23 @@ class JobRep:
         if self.start_datetime is None:
             dt_start = datetime.datetime.today()
         else:
+            if "month" in self.schedule["finish"]:
+                stop_h_m = int_time(self.schedule["finish"]["month"]["time"])
+            else:
+                if self.schedule["finish"]["time"] == "never":
+                    stop_h_m = [0, 0]
+                else:
+                    stop_h_m = int_time(self.schedule["finish"]["time"])
+
             dt_start = self.start_datetime
+            dt_actual_finish = datetime.datetime(year=dt_start.year,
+                                                 month=dt_start.month,
+                                                 day=dt_start.day,
+                                                 hour=stop_h_m[0],
+                                                 minute=stop_h_m[1])
+
+            if dt_start > dt_actual_finish:
+                dt_start += timedelta(days=1)
 
         if "month" in self.schedule["finish"]:
             if isinstance(self.schedule["finish"]["month"]["values"], str):
