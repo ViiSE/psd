@@ -101,12 +101,30 @@ class Job:
     def init_start_dt(self):
         if self.start_datetime is None:
             if "month" in self.schedule["start"]:
+                start_h_m = int_time(self.schedule["start"]["month"]["time"])
+            else:
+                if self.schedule["start"]["time"] == "now":
+                    start_h_m = [0, 0]
+                else:
+                    start_h_m = int_time(self.schedule["start"]["time"])
+
+            dt_start = datetime.datetime.today()
+            dt_actual_start = datetime.datetime(year=dt_start.year,
+                                                month=dt_start.month,
+                                                day=dt_start.day,
+                                                hour=start_h_m[0],
+                                                minute=start_h_m[1])
+            if dt_start > dt_actual_start:
+                dt_start += timedelta(days=1)
+
+            if "month" in self.schedule["start"]:
+                start_h_m = int_time(self.schedule["start"]["month"]["time"])
                 if isinstance(self.schedule["start"]["month"]["values"], list):
-                    self.dt_month = DateTimeMonthsJob(datetime.datetime.today(),
+                    self.dt_month = DateTimeMonthsJob(dt_start,
                                                       self.schedule["start"]["month"]["values"])
                     start_date = self.dt_month.next_date_time()
                 else:
-                    start_date = add_months(datetime.date.today(), self.schedule["start"]["month"]["values"])
+                    start_date = add_months(dt_start, self.schedule["start"]["month"]["values"])
                 if isinstance(self.schedule["start"]["month"]["day"], str):
                     for i in range(self.schedule["start"]["month"]["each"]):
                         start_date = next_weekday(start_date, DOW[self.schedule["start"]["month"]["day"]])
@@ -114,15 +132,13 @@ class Job:
                     start_date = datetime.date(year=start_date.year,
                                                month=start_date.month,
                                                day=self.schedule["start"]["month"]["day"])
-                start_h_m = int_time(self.schedule["start"]["month"]["time"])
             else:
                 if self.schedule["start"]["time"] == "now":
                     return None
-                start_h_m = int_time(self.schedule["start"]["time"])
                 if isinstance(self.schedule["start"]["day"], str):
-                    start_date = next_weekday(datetime.date.today(), DOW[self.schedule["start"]["day"]])
+                    start_date = next_weekday(dt_start, DOW[self.schedule["start"]["day"]])
                 else:
-                    start_date = datetime.date.today()
+                    start_date = dt_start
 
             self.start_datetime = datetime.datetime.combine(
                 start_date,
@@ -130,15 +146,15 @@ class Job:
 
     def init_stop_dt(self):
         if self.start_datetime is None:
-            start_dt = datetime.date.today()
+            dt_start = datetime.date.today()
         else:
-            start_dt = self.start_datetime
+            dt_start = self.start_datetime
 
         if "month" in self.schedule["finish"]:
             if isinstance(self.schedule["finish"]["month"]["values"], str):
-                stop_date = add_months(start_dt, self.schedule["finish"]["month"]["values"])
+                stop_date = add_months(dt_start, self.schedule["finish"]["month"]["values"])
             else:
-                stop_date = add_months(start_dt, self.schedule["finish"]["month"]["values"])
+                stop_date = add_months(dt_start, self.schedule["finish"]["month"]["values"])
             if isinstance(self.schedule["finish"]["month"]["day"], str):
                 for i in range(self.schedule["finish"]["month"]["each"]):
                     stop_date = next_weekday(stop_date, DOW[self.schedule["finish"]["month"]["day"]])
@@ -162,17 +178,17 @@ class Job:
                         stop_day = DOW[self.schedule["finish"]["day"]]
                         self.stop_datetime = next_weekday(
                             datetime.datetime.combine(
-                                start_dt,
+                                dt_start,
                                 datetime.time(stop_h_m[0], stop_h_m[1], 0)),
                             stop_day)
                     else:
                         stop_day = self.schedule["finish"]["day"]
                         self.stop_datetime = datetime.datetime.combine(
-                            start_dt + timedelta(days=stop_day),
+                            dt_start + timedelta(days=stop_day),
                             datetime.time(stop_h_m[0], stop_h_m[1], 0))
                 else:
                     self.stop_datetime = datetime.datetime.combine(
-                        start_dt + timedelta(days=stop_day),
+                        dt_start + timedelta(days=stop_day),
                         datetime.time(stop_h_m[0], stop_h_m[1], 0))
 
     def try_start(self):  # True - job is running, False - job is not running
@@ -366,12 +382,29 @@ class JobRep:
     def init_start_dt(self):
         if self.start_datetime is None:
             if "month" in self.schedule["start"]:
+                start_h_m = int_time(self.schedule["start"]["month"]["time"])
+            else:
+                if self.schedule["start"]["time"] == "now":
+                    start_h_m = [0, 0]
+                else:
+                    start_h_m = int_time(self.schedule["start"]["time"])
+
+            dt_start = datetime.datetime.today()
+            dt_actual_start = datetime.datetime(year=dt_start.year,
+                                                month=dt_start.month,
+                                                day=dt_start.day,
+                                                hour=start_h_m[0],
+                                                minute=start_h_m[1])
+            if dt_start > dt_actual_start:
+                dt_start += timedelta(days=1)
+
+            if "month" in self.schedule["start"]:
                 if isinstance(self.schedule["start"]["month"]["values"], list):
-                    self.dt_month = DateTimeMonthsJob(datetime.datetime.today(),
+                    self.dt_month = DateTimeMonthsJob(dt_start,
                                                       self.schedule["start"]["month"]["values"])
                     start_date = self.dt_month.next_date_time()
                 else:
-                    start_date = add_months(datetime.date.today(), self.schedule["start"]["month"]["values"])
+                    start_date = add_months(dt_start, self.schedule["start"]["month"]["values"])
                 if isinstance(self.schedule["start"]["month"]["day"], str):
                     for i in range(self.schedule["start"]["month"]["each"]):
                         start_date = next_weekday(start_date, DOW[self.schedule["start"]["month"]["day"]])
@@ -379,15 +412,13 @@ class JobRep:
                     start_date = datetime.date(year=start_date.year,
                                                month=start_date.month,
                                                day=self.schedule["start"]["month"]["day"])
-                start_h_m = int_time(self.schedule["start"]["month"]["time"])
             else:
                 if self.schedule["start"]["time"] == "now":
                     return None
-                start_h_m = int_time(self.schedule["start"]["time"])
                 if isinstance(self.schedule["start"]["day"], str):
-                    start_date = next_weekday(datetime.date.today(), DOW[self.schedule["start"]["day"]])
+                    start_date = next_weekday(dt_start, DOW[self.schedule["start"]["day"]])
                 else:
-                    start_date = datetime.date.today()
+                    start_date = dt_start
 
             self.start_datetime = datetime.datetime.combine(
                 start_date,
@@ -395,15 +426,15 @@ class JobRep:
 
     def init_stop_dt(self):
         if self.start_datetime is None:
-            start_dt = datetime.date.today()
+            dt_start = datetime.datetime.today()
         else:
-            start_dt = self.start_datetime
+            dt_start = self.start_datetime
 
         if "month" in self.schedule["finish"]:
             if isinstance(self.schedule["finish"]["month"]["values"], str):
-                stop_date = add_months(start_dt, self.schedule["finish"]["month"]["values"])
+                stop_date = add_months(dt_start, self.schedule["finish"]["month"]["values"])
             else:
-                stop_date = add_months(start_dt, self.schedule["finish"]["month"]["values"])
+                stop_date = add_months(dt_start, self.schedule["finish"]["month"]["values"])
             if isinstance(self.schedule["finish"]["month"]["day"], str):
                 for i in range(self.schedule["finish"]["month"]["each"]):
                     stop_date = next_weekday(stop_date, DOW[self.schedule["finish"]["month"]["day"]])
@@ -427,17 +458,17 @@ class JobRep:
                         stop_day = DOW[self.schedule["finish"]["day"]]
                         self.stop_datetime = next_weekday(
                             datetime.datetime.combine(
-                                start_dt,
+                                dt_start,
                                 datetime.time(stop_h_m[0], stop_h_m[1], 0)),
                             stop_day)
                     else:
                         stop_day = self.schedule["finish"]["day"]
                         self.stop_datetime = datetime.datetime.combine(
-                            start_dt + timedelta(days=stop_day),
+                            dt_start + timedelta(days=stop_day),
                             datetime.time(stop_h_m[0], stop_h_m[1], 0))
                 else:
                     self.stop_datetime = datetime.datetime.combine(
-                        start_dt + timedelta(days=stop_day),
+                        dt_start + timedelta(days=stop_day),
                         datetime.time(stop_h_m[0], stop_h_m[1], 0))
 
     def try_start(self):  # True - job is running, False - job is not running
