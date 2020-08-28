@@ -296,13 +296,13 @@ Example
 ```shell script
 $ python psd.py psd.json 
 [ Schedule started at 2020-04-19 14:06:30.110551 ]
-[ Job 'ping2' started at 2020-04-19 14:06:30.110607. Finished in: 2020-04-19 14:07:00. Next start: 2020-04-21 14:06:00 ]
+[STARTED] ['ping2'] [Started: 2020-04-19 14:06:30.110607] [Finished: 2020-04-19 14:07:00] [Next start: 2020-04-21 14:06:00]
 PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
 64 bytes from 8.8.8.8: icmp_seq=1 ttl=35 time=211 ms
 64 bytes from 8.8.8.8: icmp_seq=2 ttl=35 time=234 ms
 64 bytes from 8.8.8.8: icmp_seq=3 ttl=35 time=154 ms
-[ Job 'ping2' finished at 2020-04-19 14:07:00.147956 ]
-[ Job 'ls' started at 2020-04-19 14:07:35.836019. Finished in: 2020-04-22 14:08:00. Next start: 2020-04-23 14:07:00 ]
+[FINISHED] ['ping2'] [Finished: 2020-04-19 14:07:00.147956]
+[STARTED] ['ls'] [Started: 2020-04-19 14:07:35.836019] [Finished: 2020-04-22 14:08:00] [Next start: 2020-04-23 14:07:00]
 LICENSE  psd.json  psd.py  README.md
 LICENSE  psd.json  psd.py  README.md
 ```

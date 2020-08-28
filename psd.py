@@ -263,9 +263,9 @@ class Job:
                                                                     hour=self.start_datetime.hour,
                                                                     minute=self.start_datetime.minute,
                                                                     second=self.start_datetime.second)
-                    print("[ Job '" + str(self.name) + "' started at " + str(now) +
-                          ". Finished in: " + str(self.stop_datetime) +
-                          ". Next start: " + str(self.start_datetime) + " ]")
+                    print("[STARTED] ['" + str(self.name) + "'] [Started: " + str(now) +
+                          "] [Finished: " + str(self.stop_datetime) +
+                          "] [Next start: " + str(self.start_datetime) + "]")
                     return True
                 else:
                     return False
@@ -275,7 +275,7 @@ class Job:
             if self.schedule["start"]["time"] == "now":
                 if self.job is None:
                     self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
-                    print("[ Job '" + str(self.name) + "' started at " + str(datetime.datetime.now()) + " ]")
+                    print("[STARTED] ['" + str(self.name) + "'] [Started: " + str(datetime.datetime.now()) + "]")
                 return True
             else:
                 if self.job is None:
@@ -310,9 +310,9 @@ class Job:
                                                                         hour=self.start_datetime.hour,
                                                                         minute=self.start_datetime.minute,
                                                                         second=self.start_datetime.second)
-                        print("[ Job '" + str(self.name) + "' started at " + str(now) +
-                              ". Finished in: " + str(self.stop_datetime) +
-                              ". Next start: " + str(self.start_datetime) + " ]")
+                        print("[STARTED] ['" + str(self.name) + "'] [Started: " + str(now) +
+                              "] [Finished: " + str(self.stop_datetime) +
+                              "] [Next start: " + str(self.start_datetime) + "]")
                         return True
                     else:
                         return False
@@ -328,7 +328,7 @@ class Job:
                 else:
                     self.job.kill()
                 self.job = None
-                print("[ Job '" + self.name + "' finished at " + str(now) + " ]")
+                print("[FINISHED] ['" + self.name + "'] [Finished: " + str(now) + "]")
 
                 if isinstance(self.schedule["finish"]["month"]["values"], str):
                     stop_date = add_months(self.stop_datetime, MONTHS[self.schedule["finish"]["month"]["values"]])
@@ -361,7 +361,7 @@ class Job:
                     else:
                         self.job.kill()
                     self.job = None
-                    print("[ Job '" + self.name + "' finished at " + str(now) + " ]")
+                    print("[FINISHED] ['" + self.name + "'] [Finished: " + str(now) + "]")
 
                     stop_h_m = int_time(self.schedule["finish"]["time"])
                     stop_day = self.schedule["start"]["day"]
@@ -390,7 +390,7 @@ class Job:
                 subprocess.call(['taskkill', '/F', '/T', '/PID', str(self.job.pid)])
             else:
                 self.job.kill()
-            print("[ Job '" + self.name + "' finished at " + str(datetime.datetime.now()) + " ]")
+            print("[FINISHED] ['" + self.name + "'] [Finished: " + str(datetime.datetime.now()) + "]")
 
 
 class JobRep:
@@ -582,9 +582,9 @@ class JobRep:
                                                                     hour=self.start_datetime.hour,
                                                                     minute=self.start_datetime.minute,
                                                                     second=self.start_datetime.second)
-                    print("[ Job '" + str(self.name) + "' started at " + str(now) +
-                          ". Finished in: " + str(self.stop_datetime) +
-                          ". Next start: " + str(self.start_datetime) + " ]")
+                    print("[STARTED] ['" + str(self.name) + "'] [Started: " + str(now) +
+                          "] [Finished: " + str(self.stop_datetime) +
+                          "] [Next start: " + str(self.start_datetime) + "]")
                     return True
                 else:
                     return False
@@ -595,7 +595,7 @@ class JobRep:
                 if self.job is None:
                     self.is_start = True
                     self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
-                    print("[ Job '" + str(self.name) + "' started at " + str(datetime.datetime.now()) + " ]")
+                    print("[STARTED] ['" + str(self.name) + "'] [Started: " + str(datetime.datetime.now()) + "]")
                 return True
             else:
                 if self.job is None:
@@ -633,9 +633,9 @@ class JobRep:
                                                                         hour=self.start_datetime.hour,
                                                                         minute=self.start_datetime.minute,
                                                                         second=self.start_datetime.second)
-                        print("[ Job '" + str(self.name) + "' started at " + str(now) +
-                              ". Finished in: " + str(self.stop_datetime) +
-                              ". Next start: " + str(self.start_datetime) + " ]")
+                        print("[STARTED] ['" + str(self.name) + "'] [Started: " + str(now) +
+                              "] [Finished: " + str(self.stop_datetime) +
+                              "] [Next start: " + str(self.start_datetime) + "]")
                         return True
                     else:
                         return False
@@ -650,7 +650,7 @@ class JobRep:
         if "month" in self.schedule["finish"]:
             if now > self.stop_datetime:
                 self.is_start = False
-                print("[ Job '" + self.name + "' finished at " + str(now) + " ]")
+                print("[FINISHED] ['" + self.name + "'] [Finished: " + str(now) + "]")
 
                 if isinstance(self.schedule["finish"]["month"]["values"], str):
                     stop_date = add_months(self.stop_datetime, MONTHS[self.schedule["finish"]["month"]["values"]])
@@ -679,7 +679,7 @@ class JobRep:
 
                 if now > self.stop_datetime:
                     self.is_start = False
-                    print("[ Job '" + self.name + "' finished at " + str(now) + " ]")
+                    print("[FINISHED] ['" + self.name + "'] [Finished: " + str(now) + "]")
 
                     stop_h_m = int_time(self.schedule["finish"]["time"])
                     stop_day = self.schedule["start"]["day"]
@@ -724,10 +724,10 @@ class JobRep:
         if not self.is_stop:
             if self.job is None:
                 self.is_stop = True
-                print("[ Job '" + self.name + "' finished at " + str(datetime.datetime.now()) + " ]")
+                print("[FINISHED] ['" + self.name + "'] [Finished: " + str(datetime.datetime.now()) + "]")
             elif self.job.poll() is not None:  # if process is terminated
                 self.is_stop = True
-                print("[ Job '" + self.name + "' finished at " + str(datetime.datetime.now()) + " ]")
+                print("[FINISHED] ['" + self.name + "'] [Finished: " + str(datetime.datetime.now()) + "]")
 
 
 def calc_repeat(dt, repeat):
