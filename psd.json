@@ -62,6 +62,90 @@
     },
     {
       "file": "whoami.json"
+    },
+    {
+      "name": "ls_3",
+      "cmd": "ls",
+      "schedule": {
+        "start": {
+          "month": {
+            "values": ["jan", "may"],
+            "day": "wed",
+            "each": 2,
+            "time": "18:00"
+          }
+        },
+        "finish": {
+          "month": {
+            "values": 1,
+            "day": 10,
+            "time": "17:00"
+          }
+        }
+      }
+    },
+    {
+      "name": "ls_4",
+      "cmd": "ls",
+      "schedule": {
+        "start": {
+          "month": {
+            "values": 1,
+            "day": 23,
+            "time": "15:00"
+          }
+        },
+        "finish": {
+          "month": {
+            "values": "jan",
+            "day": "wed",
+            "each": 2,
+            "time": "18:00"
+          }
+        }
+      }
+    },
+    {
+      "name": "ls_5",
+      "cmd": "ls",
+      "schedule": {
+        "start": {
+          "time": "18:40",
+          "day": 1,
+          "when_finished": true
+        },
+        "finish": {
+          "month": {
+            "values": 1,
+            "day": 10,
+            "time": "17:00"
+          }
+        }
+      }
+    },
+    {
+      "name": "ls_6",
+      "cmd": "ls",
+      "schedule": {
+        "start": {
+          "time": "18:40",
+          "day": 1,
+          "when_finished": true
+        },
+        "finish": {
+          "month": {
+            "values": "jan",
+            "day": "wed",
+            "each": 2,
+            "time": "18:00"
+          }
+        }
+      },
+      "repeat": {
+        "unit": "m",
+        "val": 1,
+        "wait_finished": true
+      }
     }
   ]
 }
