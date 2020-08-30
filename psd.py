@@ -364,7 +364,7 @@ class Job:
                     print("[FINISHED] ['" + self.name + "'] [Finished: " + str(now) + "]")
 
                     stop_h_m = int_time(self.schedule["finish"]["time"])
-                    stop_day = self.schedule["start"]["day"]
+                    stop_day = 0
                     if "day" in self.schedule["finish"]:
                         if isinstance(self.schedule["finish"]["day"], str):
                             stop_day = DOW[self.schedule["finish"]["day"]]
@@ -682,7 +682,7 @@ class JobRep:
                     print("[FINISHED] ['" + self.name + "'] [Finished: " + str(now) + "]")
 
                     stop_h_m = int_time(self.schedule["finish"]["time"])
-                    stop_day = self.schedule["start"]["day"]
+                    stop_day = 0
                     if "day" in self.schedule["finish"]:
                         if isinstance(self.schedule["finish"]["day"], str):
                             stop_day = DOW[self.schedule["finish"]["day"]]
