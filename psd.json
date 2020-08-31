@@ -1,6 +1,12 @@
 {
   "is_shell": true,
   "wait_repeated_jobs": true,
+  "encoding": "utf-8",
+  "log": {
+    "enabled": false,
+    "prefix": "log_",
+    "folder": "logs/"
+  },
   "jobs": [
     {
       "name": "ping1",

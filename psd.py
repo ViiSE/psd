@@ -23,6 +23,7 @@ import time
 from datetime import timedelta
 from os import environ
 from os import path
+from os import mkdir
 
 DOW = {"mon": 0, "tue": 1, "wed": 2, "thu": 3,  "fri": 4, "sat": 5, "sun": 6}
 
@@ -36,6 +37,10 @@ GREEN = 28
 BLUE = 44
 YELLOW = 136
 
+LOG = False
+LOG_FOLDER = "logs/"
+LOG_PREFIX = "log_"
+ENCODING = sys.getdefaultencoding()
 
 class DateTimeMonthsJob:
     def __init__(self, _dt, _months):
@@ -570,26 +575,37 @@ def compatible_shell():
 
 
 def start_msg_full(job_name, started_dt, stop_dt, next_dt):
+    if LOG:
+        log("[STARTED ] ['" + str(job_name) + "'] [Started: " +
+            str(started_dt) + "] [Finished: " + str(stop_dt) +
+            "] [Next start: " + str(next_dt) + "]")
+
     if platform.system() == "Linux":
         if compatible_shell():
             return color_msg(GREEN, "[STARTED ]") + " ['" + str(job_name) + "']" + " " + \
                    color_msg(BLUE, "[Started: " + str(started_dt) + "]") + " " + \
                    color_msg(YELLOW, "[Finished: " + str(stop_dt) + "]") + " " + \
                    color_msg(GREEN, "[Next start: " + str(next_dt) + "]")
-    return "[STARTED] ['" + str(job_name) + "'] [Started: " +\
+    return "[STARTED ] ['" + str(job_name) + "'] [Started: " +\
            str(started_dt) + "] [Finished: " + str(stop_dt) +\
            "] [Next start: " + str(next_dt) + "]"
 
 
 def start_msg_short(job_name, started_dt):
+    if LOG:
+        log("[STARTED ] ['" + str(job_name) + "'] [Started: " + str(started_dt) + "]")
+
     if platform.system() == "Linux":
         if compatible_shell():
             return color_msg(GREEN, "[STARTED ]") + " ['" + str(job_name) + "']" + " " + \
                    color_msg(BLUE, "[Started: " + str(started_dt) + "]")
-    return "[STARTED] ['" + str(job_name) + "'] [Started: " + str(started_dt) + "]"
+    return "[STARTED ] ['" + str(job_name) + "'] [Started: " + str(started_dt) + "]"
 
 
 def stop_msg(job_name, stop_dt):
+    if LOG:
+        log("[FINISHED] ['" + job_name + "'] [Finished: " + str(stop_dt) + "]")
+
     if platform.system() == "Linux":
         if compatible_shell():
             return color_msg(YELLOW, "[FINISHED]") + " ['" + str(job_name) + "']" + " " + \
@@ -601,7 +617,20 @@ def color_msg(color, msg):
     return "\033[38;5;" + str(color) + "m" + msg + "\033[0m"
 
 
+def log(message):
+    log_filename = LOG_FOLDER + LOG_PREFIX + str(datetime.date.today())
+    new_line = "\n"
+    if platform.system() == 'Windows':
+        new_line = "\r\n"
+    with open(log_filename, 'a', encoding=ENCODING) as lg_file:
+        lg_file.write(message + new_line)
+        lg_file.close()
+
+
 def error(message):
+    if LOG:
+        log(message)
+
     if compatible_shell():
         print(color_msg(RED, message))
     else:
@@ -647,7 +676,7 @@ if f_name == '':
 jobs = []
 jobs_r = []
 
-settings = json.load(open(f_name))
+settings = json.load(open(f_name, encoding=ENCODING))
 if "is_shell" not in settings:
     is_shell = True
 else:
@@ -661,12 +690,31 @@ working_dir = ""
 if "working_dir" in settings:
     working_dir = settings["working_dir"]
 
+if "encoding" in settings:
+    ENCODING = settings["encoding"]
+
+if "log" in settings:
+    LOG = settings["log"]["enabled"]
+    if "folder" in settings["log"]:
+        LOG_FOLDER = settings["log"]["folder"]
+    if "prefix" in settings["log"]:
+        LOG_PREFIX = settings["log"]["prefix"]
+
+    if LOG:
+        if not path.isdir(LOG_FOLDER):
+            try:
+                mkdir(LOG_FOLDER)
+            except OSError:
+                error("Creation of the log directory '" + LOG_FOLDER + "' failed")
+            else:
+                print("The log directory '" + LOG_FOLDER + "' is created.")
+
 for js in settings["jobs"]:
     _when_finished = False
     js_f_name = None
     if "file" in js:
         js_f_name = path.splitext(js["file"])[0]
-        js = json.load(open(working_dir + js["file"]))
+        js = json.load(open(working_dir + js["file"], encoding=ENCODING))
 
     if "name" not in js:
         if js_f_name is not None:

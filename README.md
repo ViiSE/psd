@@ -24,6 +24,12 @@ File contents:
   "is_shell": true,
   "wait_repeated_jobs": true,
   "working_dir": "/home/user/psd/",
+  "encoding": "utf-8",
+  "log": {
+    "enabled": false,
+    "prefix": "log_",
+    "folder": "logs/"
+  },
   "jobs": [
     {
       "name": "ping1",
@@ -176,8 +182,13 @@ Fields description:<br>
 - <code>*"wait_repeated_jobs"</code>: wait to completing repeated jobs or not if psd get SIGINT signal 
                                       (ctrl+C, for example). <code>true</code> - wait, <code>false</code> - finished psd
                                       immediately.
-- <code>*"working_dir"</code>: directory where task files are located. The default value is the directory from which psd
-                               run.
+- <code>"working_dir"</code>: directory where task files are located. The default value is the directory from which psd
+                              run.
+- <code>"encoding"</code>: encoding from <code>"file"</code> attribute. Default value is default OS encoding.
+- <code>"log"</code>: psd log which write all terminal output in files. File format: <code>LOG_PREFIX_yyyy-mm-dd</code>:
+    - <code>"enabled"</code>: - enabled log or not. Default value - <code>false</code>.
+    - <code>"prefix"</code>: - log file prefix. Default value - <code>"log_"</code>.
+    - <code>"folder"</code>: - log folder with log files. Default value - <code>logs/</code> in current directory. 
 - <code>*"jobs"</code>: the list that contains jobs:
     - <code>*"name"</code>: job name;
     - <code>*"cmd"</code>: command for job;
@@ -267,6 +278,11 @@ You can ignore field <code>"name"</code> in job file. In this case, job will hav
 
 If <code>"working_dir"</code> is defined in settings file, then the full file name is optional.
 
+## Terminal output highlighting
+psd support color terminal output. 
+[List of compatible terminal](#list-of-compatible-highlighting-output-terminal).
+# <img src=psd_highlight.png/> psd
+
 ## Days of week values
 1) <code>"mon"</code> - Monday;
 2) <code>"tue"</code> - Tuesday;
@@ -290,6 +306,17 @@ If <code>"working_dir"</code> is defined in settings file, then the full file na
 11) <code>"nov"</code> - November;
 12) <code>"dec"</code> - December.
 
+## List of compatible highlighting output terminal
+1) [Eterm](https://github.com/mej/Eterm)
+2) [GNOME Terminal](https://help.gnome.org/users/gnome-terminal/)
+3) [Guake](http://guake.org)
+4) [Konsole](https://konsole.kde.org/)
+5) [Nautilus Terminal](https://github.com/flozz/nautilus-terminal)
+6) [Terminator](https://code.google.com/archive/p/jessies/wikis/Terminator.wiki)
+7) [Tilda](http://tilda.sourceforge.net/tildaabout.php)
+8) [XFCE4 Terminal](https://docs.xfce.org/apps/terminal/start)
+9) [XTerm](https://invisible-island.net/xterm/xterm.html)
+10) [VTE Terminal](https://developer.gnome.org/vte/)
 
 Example
 -------

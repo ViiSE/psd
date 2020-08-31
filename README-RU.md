@@ -178,6 +178,13 @@ psd.json
                                       немедленно.
 - <code>*"working_dir"</code>: директория, в которой находятся файлы задач. Значение по умолчанию - директория, из 
                                            которой запускается скрипт.
+- <code>"encoding"</code>: кодировка для атрибута <code>"file"</code>. Значение по умолчанию - текущая кодировка ОС.
+- <code>"log"</code>: лог psd, записывающий весь терминальный вывод в файлы. Формат файла: 
+                      <code>LOG_PREFIX_yyyy-mm-dd</code>:
+    - <code>"enabled"</code>: - включен лог или нет. Значение по умолчанию - <code>false</code>.
+    - <code>"prefix"</code>: - префикс файла лога. Значение по умолчанию - <code>"log_"</code>.
+    - <code>"folder"</code>: - папка лога, где находятся файлы лога. Значение по умолчанию - папка <code>logs/</code> в
+                               текущей директории. 
 - <code>*"jobs"</code>: список задач:
     - <code>*"name"</code>: имя задачи;
     - <code>*"cmd"</code>: команда задачи;
@@ -267,6 +274,11 @@ psd.json
 
 Если в файле планировщика будет определено поле <code>"working_dir"</code>, то указывать полное имя файла не нужно. 
 
+## Подсветка терминального вывода
+psd поддерживает цветной вывод в терминал. 
+[Список поддерживаемых терминалов](#список-поддерживаемых-подсветку-терминалов).
+# <img src=psd_highlight.png/> psd
+
 ## Значения дней недели
 1) <code>"mon"</code> - Понедельник;
 2) <code>"tue"</code> - Вторник;
@@ -290,6 +302,17 @@ psd.json
 11) <code>"nov"</code> - Ноябрь;
 12) <code>"dec"</code> - Декабрь.
 
+## Список поддерживаемых подсветку терминалов
+1) [Eterm](https://github.com/mej/Eterm)
+2) [GNOME Terminal](https://help.gnome.org/users/gnome-terminal/)
+3) [Guake](http://guake.org)
+4) [Konsole](https://konsole.kde.org/)
+5) [Nautilus Terminal](https://github.com/flozz/nautilus-terminal)
+6) [Terminator](https://code.google.com/archive/p/jessies/wikis/Terminator.wiki)
+7) [Tilda](http://tilda.sourceforge.net/tildaabout.php)
+8) [XFCE4 Terminal](https://docs.xfce.org/apps/terminal/start)
+9) [XTerm](https://invisible-island.net/xterm/xterm.html)
+10) [VTE Terminal](https://developer.gnome.org/vte/)
 
 Пример
 -------
