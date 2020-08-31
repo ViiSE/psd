@@ -31,6 +31,11 @@ MONTHS = {"dec": 12, "jan": 1,  "feb": 2,
           "jun": 6,  "jul": 7,  "aug": 8,
           "sep": 9,  "oct": 10, "nov": 11}
 
+RED = 160
+GREEN = 28
+BLUE = 44
+YELLOW = 136
+
 
 class DateTimeMonthsJob:
     def __init__(self, _dt, _months):
@@ -567,10 +572,10 @@ def compatible_shell():
 def start_msg_full(job_name, started_dt, stop_dt, next_dt):
     if platform.system() == "Linux":
         if compatible_shell():
-            return color_msg(28, "[STARTED ]") + " ['" + str(job_name) + "']" + " " + \
-                   color_msg(44, "[Started: " + str(started_dt) + "]") + " " + \
-                   color_msg(136, "[Finished: " + str(stop_dt) + "]") + " " + \
-                   color_msg(28, "[Next start: " + str(next_dt) + "]")
+            return color_msg(GREEN, "[STARTED ]") + " ['" + str(job_name) + "']" + " " + \
+                   color_msg(BLUE, "[Started: " + str(started_dt) + "]") + " " + \
+                   color_msg(YELLOW, "[Finished: " + str(stop_dt) + "]") + " " + \
+                   color_msg(GREEN, "[Next start: " + str(next_dt) + "]")
     return "[STARTED] ['" + str(job_name) + "'] [Started: " +\
            str(started_dt) + "] [Finished: " + str(stop_dt) +\
            "] [Next start: " + str(next_dt) + "]"
@@ -579,16 +584,16 @@ def start_msg_full(job_name, started_dt, stop_dt, next_dt):
 def start_msg_short(job_name, started_dt):
     if platform.system() == "Linux":
         if compatible_shell():
-            return color_msg(28, "[STARTED ]") + " ['" + str(job_name) + "']" + " " + \
-                   color_msg(44, "[Started: " + str(started_dt) + "]")
+            return color_msg(GREEN, "[STARTED ]") + " ['" + str(job_name) + "']" + " " + \
+                   color_msg(BLUE, "[Started: " + str(started_dt) + "]")
     return "[STARTED] ['" + str(job_name) + "'] [Started: " + str(started_dt) + "]"
 
 
 def stop_msg(job_name, stop_dt):
     if platform.system() == "Linux":
         if compatible_shell():
-            return color_msg(28, "[FINISHED]") + " ['" + str(job_name) + "']" + " " + \
-                   color_msg(136, "[Finished: " + str(stop_dt) + "]")
+            return color_msg(YELLOW, "[FINISHED]") + " ['" + str(job_name) + "']" + " " + \
+                   color_msg(YELLOW, "[Finished: " + str(stop_dt) + "]")
     return "[FINISHED] ['" + job_name + "'] [Finished: " + str(stop_dt) + "]"
 
 
@@ -598,7 +603,7 @@ def color_msg(color, msg):
 
 def error(message):
     if compatible_shell():
-        print(color_msg(160, message))
+        print(color_msg(RED, message))
     else:
         print(message)
     exit(-1)
