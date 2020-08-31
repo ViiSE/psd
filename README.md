@@ -281,7 +281,8 @@ If <code>"working_dir"</code> is defined in settings file, then the full file na
 ## Terminal output highlighting
 psd support color terminal output. 
 [List of compatible terminal](#list-of-compatible-highlighting-output-terminal).
-# <img src=psd_highlight.png/> psd
+<img src=psd-highlight.png/>
+
 
 ## Days of week values
 1) <code>"mon"</code> - Monday;
