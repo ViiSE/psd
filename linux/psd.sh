@@ -1,1 +1,2 @@
-python psd.py "$1"
+#! /bin/sh
+python "$PSD_HOME"/psd.py "$1"

@@ -1,2 +1,2 @@
 @echo off
-python.exe psd.py %1
+python.exe %PSD_HOME%\psd.py %1

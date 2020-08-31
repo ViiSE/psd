@@ -665,13 +665,15 @@ def sigint_handler(signum, frame):
     exit(1)
 
 
+working_path = path.realpath(__file__)[:-6]  # remove psd.py
+
 try:
     f_name = sys.argv[1]
 except IndexError:
-    f_name = "psd.json"
+    f_name = working_path + "psd.json"
 
 if f_name == '':
-    f_name = "psd.json"
+    f_name = working_path + "psd.json"
 
 jobs = []
 jobs_r = []
@@ -686,7 +688,7 @@ if "wait_repeated_jobs" not in settings:
 else:
     wait_rep_jobs = settings["wait_repeated_jobs"]
 
-working_dir = ""
+working_dir = working_path
 if "working_dir" in settings:
     working_dir = settings["working_dir"]
 
