@@ -98,7 +98,7 @@ def add_months(dt, months):
 class Job:
     def __init__(self, name, cmd, schedule, when_finished, is_sh):
         self.name = name
-        self.cmd = cmd
+        self.cmd = cmd.split(" ")
         self.schedule = schedule
         self.is_shell = is_sh
         self.when_finished = when_finished
@@ -402,29 +402,257 @@ class Job:
             print(stop_msg(self.name, str(datetime.datetime.now())))
 
 
-class JobRep(Job):
+class JobRep:
     def __init__(self, name, cmd, schedule, when_finished, is_sh, repeat):
-        super().__init__(name, cmd, schedule, when_finished, is_sh)
+        self.name = name
+        self.cmd = cmd.split(" ")
+        self.schedule = schedule
+        self.when_finished = when_finished
+        self.is_shell = is_sh
         self.repeat = repeat
+        self.job = None
+        self.start_datetime = None
+        self.stop_datetime = None
+        self.dt_month = None
         self.next_repeat = None
         self.is_start = False
         self.is_stop = False
+        self.init_start_dt()
+        self.init_stop_dt()
+
+    def init_start_dt(self):
+        if self.start_datetime is None:
+            if "month" in self.schedule["start"]:
+                start_h_m = int_time(self.schedule["start"]["month"]["time"])
+            else:
+                if self.schedule["start"]["time"] == "now":
+                    start_h_m = [0, 0]
+                else:
+                    start_h_m = int_time(self.schedule["start"]["time"])
+
+            if "month" in self.schedule["finish"]:
+                stop_h_m = int_time(self.schedule["finish"]["month"]["time"])
+            else:
+                if self.schedule["finish"]["time"] == "never":
+                    stop_h_m = [0, 0]
+                else:
+                    stop_h_m = int_time(self.schedule["finish"]["time"])
+
+            dt_start = datetime.datetime.today()
+            dt_actual_start = datetime.datetime(year=dt_start.year,
+                                                month=dt_start.month,
+                                                day=dt_start.day,
+                                                hour=start_h_m[0],
+                                                minute=start_h_m[1])
+            dt_actual_finish = datetime.datetime(year=dt_start.year,
+                                                 month=dt_start.month,
+                                                 day=dt_start.day,
+                                                 hour=stop_h_m[0],
+                                                 minute=stop_h_m[1])
+
+            if dt_actual_start > dt_actual_finish:
+                dt_actual_finish += timedelta(days=1)
+
+            if not(dt_actual_start < dt_start < dt_actual_finish):
+                if not(dt_start < dt_actual_start and dt_start < dt_actual_finish):
+                    dt_start += timedelta(days=1)
+
+            if "month" in self.schedule["start"]:
+                start_h_m = int_time(self.schedule["start"]["month"]["time"])
+                if isinstance(self.schedule["start"]["month"]["values"], list):
+                    self.dt_month = DateTimeMonthsJob(dt_start,
+                                                      self.schedule["start"]["month"]["values"])
+                    start_date = self.dt_month.next_date_time()
+                else:
+                    start_date = add_months(dt_start, self.schedule["start"]["month"]["values"])
+                if isinstance(self.schedule["start"]["month"]["day"], str):
+                    for i in range(self.schedule["start"]["month"]["each"]):
+                        start_date = next_weekday(start_date, DOW[self.schedule["start"]["month"]["day"]])
+                else:
+                    start_date = datetime.date(year=start_date.year,
+                                               month=start_date.month,
+                                               day=self.schedule["start"]["month"]["day"])
+            else:
+                if self.schedule["start"]["time"] == "now":
+                    return None
+                if isinstance(self.schedule["start"]["day"], str):
+                    start_date = next_weekday(dt_start, DOW[self.schedule["start"]["day"]])
+                else:
+                    start_date = dt_start
+
+            self.start_datetime = datetime.datetime.combine(
+                start_date,
+                datetime.time(start_h_m[0], start_h_m[1], 0))
+
+    def init_stop_dt(self):
+        if self.start_datetime is None:
+            dt_start = datetime.date.today()
+        else:
+            if "month" in self.schedule["finish"]:
+                stop_h_m = int_time(self.schedule["finish"]["month"]["time"])
+            else:
+                if self.schedule["finish"]["time"] == "never":
+                    stop_h_m = [0, 0]
+                else:
+                    stop_h_m = int_time(self.schedule["finish"]["time"])
+
+            dt_start = self.start_datetime
+            dt_actual_finish = datetime.datetime(year=dt_start.year,
+                                                 month=dt_start.month,
+                                                 day=dt_start.day,
+                                                 hour=stop_h_m[0],
+                                                 minute=stop_h_m[1])
+
+            if dt_start > dt_actual_finish:
+                dt_start += timedelta(days=1)
+
+        if "month" in self.schedule["finish"]:
+            if isinstance(self.schedule["finish"]["month"]["values"], str):
+                stop_date = add_months(dt_start, self.schedule["finish"]["month"]["values"])
+            else:
+                stop_date = add_months(dt_start, self.schedule["finish"]["month"]["values"])
+            if isinstance(self.schedule["finish"]["month"]["day"], str):
+                for i in range(self.schedule["finish"]["month"]["each"]):
+                    stop_date = next_weekday(stop_date, DOW[self.schedule["finish"]["month"]["day"]])
+            else:
+                stop_date = datetime.date(year=stop_date.year,
+                                          month=stop_date.month,
+                                          day=self.schedule["finish"]["month"]["day"])
+            stop_h_m = int_time(self.schedule["finish"]["month"]["time"])
+            self.stop_datetime = datetime.datetime.combine(
+                stop_date,
+                datetime.time(stop_h_m[0], stop_h_m[1], 0))
+        else:
+            if self.schedule["finish"]["time"] == "never":
+                return None
+
+            if self.stop_datetime is None:
+                stop_h_m = int_time(self.schedule["finish"]["time"])
+                stop_day = 0
+                if "day" in self.schedule["finish"]:
+                    if isinstance(self.schedule["finish"]["day"], str):
+                        stop_day = DOW[self.schedule["finish"]["day"]]
+                        self.stop_datetime = next_weekday(
+                            datetime.datetime.combine(
+                                dt_start,
+                                datetime.time(stop_h_m[0], stop_h_m[1], 0)),
+                            stop_day)
+                    else:
+                        stop_day = self.schedule["finish"]["day"]
+                        self.stop_datetime = datetime.datetime.combine(
+                            dt_start + timedelta(days=stop_day),
+                            datetime.time(stop_h_m[0], stop_h_m[1], 0))
+                else:
+                    self.stop_datetime = datetime.datetime.combine(
+                        dt_start + timedelta(days=stop_day),
+                        datetime.time(stop_h_m[0], stop_h_m[1], 0))
 
     def try_start(self):  # True - job is running, False - job is not running
         if self.is_stop:
             return False
         if self.is_start:
             return True
-        elif super().try_start():
-            self.is_start = True
-            now = datetime.datetime.now()
-            self.next_repeat = calc_repeat(now, self.repeat)
-            return True
+        elif "month" in self.schedule["start"]:
+            if self.job is None:
+                now = datetime.datetime.now()
+                if self.start_datetime <= now <= self.stop_datetime:
+                    self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
+                    self.is_start = True
+                    self.next_repeat = calc_repeat(now, self.repeat)
+                    if isinstance(self.schedule["start"]["month"]["values"], list):
+                        start_date = self.dt_month.next_date_time()
+                    else:
+                        start_date = add_months(self.start_datetime, self.schedule["start"]["month"]["values"])
+                    if isinstance(self.schedule["start"]["month"]["day"], str):
+                        for i in range(self.schedule["start"]["month"]["each"]):
+                            start_date = next_weekday(start_date, DOW[self.schedule["start"]["month"]["day"]])
+                    else:
+                        start_date = datetime.date(year=start_date.year,
+                                                   month=start_date.month,
+                                                   day=self.schedule["start"]["month"]["day"])
+                    start_h_m = int_time(self.schedule["start"]["month"]["time"])
+
+                    self.start_datetime = datetime.datetime.combine(
+                        start_date,
+                        datetime.time(start_h_m[0], start_h_m[1], 0))
+
+                    if self.when_finished:
+                        if self.start_datetime < self.stop_datetime:
+                            temp_start_date = datetime.date(year=self.stop_datetime.year,
+                                                            month=self.stop_datetime.month,
+                                                            day=self.stop_datetime.day)
+                            if isinstance(self.schedule["start"]["day"], str):
+                                temp_start_date += next_weekday(temp_start_date,
+                                                                DOW[self.schedule["start"]["day"]])
+                            else:
+                                temp_start_date += timedelta(days=self.schedule["start"]["day"])
+                            self.start_datetime = datetime.datetime(year=temp_start_date.year,
+                                                                    month=temp_start_date.month,
+                                                                    day=temp_start_date.day,
+                                                                    hour=self.start_datetime.hour,
+                                                                    minute=self.start_datetime.minute,
+                                                                    second=self.start_datetime.second)
+
+                    print(start_msg_full(self.name, str(now), self.stop_datetime, self.start_datetime))
+                    return True
+                else:
+                    return False
+            else:
+                return True
         else:
-            return False
+            if self.schedule["start"]["time"] == "now":
+                if self.job is None:
+                    self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
+                    print(start_msg_short(self.name, datetime.datetime.now()))
+                return True
+            else:
+                if self.job is None:
+                    now = datetime.datetime.now()
+                    if self.start_datetime <= now <= self.stop_datetime:
+                        self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
+                        self.is_start = True
+                        self.next_repeat = calc_repeat(now, self.repeat)
+                        start_h_m = int_time(self.schedule["start"]["time"])
+                        start_day = self.schedule["start"]["day"]
+                        start_date = datetime.datetime.now()
+                        if "day" in self.schedule["finish"]:
+                            if isinstance(self.schedule["finish"]["day"], str):
+                                start_date = next_weekday(datetime.date.today(), DOW[self.schedule["finish"]["day"]])
+                            else:
+                                start_day += self.schedule["finish"]["day"]
+                        self.start_datetime = datetime.datetime.combine(
+                            start_date + timedelta(days=start_day),
+                            datetime.time(start_h_m[0], start_h_m[1], 0))
+
+                        if self.when_finished:
+                            if self.start_datetime < self.stop_datetime:
+                                temp_start_date = datetime.date(year=self.stop_datetime.year,
+                                                                month=self.stop_datetime.month,
+                                                                day=self.stop_datetime.day)
+                                if isinstance(self.schedule["start"]["day"], str):
+                                    temp_start_date += next_weekday(temp_start_date,
+                                                                    DOW[self.schedule["start"]["day"]])
+                                else:
+                                    temp_start_date += timedelta(days=self.schedule["start"]["day"])
+                                self.start_datetime = datetime.datetime(year=temp_start_date.year,
+                                                                        month=temp_start_date.month,
+                                                                        day=temp_start_date.day,
+                                                                        hour=self.start_datetime.hour,
+                                                                        minute=self.start_datetime.minute,
+                                                                        second=self.start_datetime.second)
+                        print(start_msg_full(self.name, str(now), self.stop_datetime, self.start_datetime))
+                        return True
+                    else:
+                        return False
+                else:
+                    return True
 
     def try_stop(self):  # true - job is finished, false - job is not finished
         if self.is_stop:
+            return True
+        if not self.is_start:
+            if self.job.poll() is not None:  # if process is terminated
+                self.job = None
             return True
 
         now = datetime.datetime.now()
@@ -485,18 +713,19 @@ class JobRep(Job):
 
     def try_repeat(self):
         if not self.is_stop:
-            now = datetime.datetime.now()
-            if now > self.next_repeat:
-                if self.repeat["wait_finished"]:
-                    if self.job is None:
+            if self.is_start:
+                now = datetime.datetime.now()
+                if now > self.next_repeat:
+                    if self.repeat["wait_finished"]:
+                        if self.job is None:
+                            self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
+                            self.next_repeat = calc_repeat(now, self.repeat)
+                        elif self.job.poll() is not None:  # if process is terminated
+                            self.next_repeat = calc_repeat(now, self.repeat)
+                            self.job = None
+                    else:
                         self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
                         self.next_repeat = calc_repeat(now, self.repeat)
-                    elif self.job.poll() is not None:  # if process is terminated
-                        self.next_repeat = calc_repeat(now, self.repeat)
-                        self.job = None
-                else:
-                    self.job = subprocess.Popen(self.cmd, shell=self.is_shell)
-                    self.next_repeat = calc_repeat(now, self.repeat)
 
     def try_stop_immediately(self):
         if not self.is_start:
