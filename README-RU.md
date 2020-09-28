@@ -1,5 +1,5 @@
 # <img src=psd_logo.png weight="64" height="64"/> psd
-Простой планировщик задач на python.
+(EN)[https://github.com/ViiSE/psd/blob/master/README.md] Простой планировщик задач на python.
 
 Использование
 -------------

@@ -1,5 +1,5 @@
 # <img src=psd_logo.png weight="64" height="64"/> psd
-Simple python script scheduler.
+[RU](https://github.com/ViiSE/psd/blob/master/README-RU.md) Simple python script scheduler.
 
 Usage
 -----
