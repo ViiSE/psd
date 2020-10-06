@@ -283,6 +283,9 @@ psd support color terminal output.
 [List of compatible terminal](#list-of-compatible-highlighting-output-terminal).
 <img src=psd-highlight.png/>
 
+## Debug mode
+You can use debug mode with `--debug` parameter.
+<img src=psd-debug.png/>
 
 ## Days of week values
 1) <code>"mon"</code> - Monday;
