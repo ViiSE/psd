@@ -392,19 +392,19 @@ class Job:
                             temp_start_date = datetime.date(year=self.stop_datetime.year,
                                                             month=self.stop_datetime.month,
                                                             day=self.stop_datetime.day)
-                            try_debug("job: " + self.name + " temp_start_date: " + temp_start_date)
+                            try_debug("job: " + self.name + " temp_start_date: " + str(temp_start_date))
                             if isinstance(self.schedule["start"]["day"], str):
                                 temp_start_date += next_weekday(temp_start_date,
                                                                 DOW[self.schedule["start"]["day"]])
                                 try_debug("job: " + self.name +
                                           "section: 'if isinstance(self.schedule['start']['day'], str)'"
-                                          ": temp_start_date: " + temp_start_date)
+                                          ": temp_start_date: " + str(temp_start_date))
                             else:
                                 temp_start_date += timedelta(days=self.schedule["start"]["day"])
                                 try_debug(
                                     "job: " + self.name +
                                     "section: 'if isinstance(self.schedule['start']['day'], str)': else:"
-                                    " temp_start_date: " + temp_start_date)
+                                    " temp_start_date: " + str(temp_start_date))
                             self.start_datetime = datetime.datetime(year=temp_start_date.year,
                                                                     month=temp_start_date.month,
                                                                     day=temp_start_date.day,
@@ -413,7 +413,7 @@ class Job:
                                                                     second=self.start_datetime.second)
                             try_debug("job: " + self.name +
                                       "section: 'if self.start_datetime < self.stop_datetime'"
-                                      ": start_datetime: " + self.start_datetime)
+                                      ": start_datetime: " + str(self.start_datetime))
 
                     print(start_msg_full(self.name, str(now), self.stop_datetime, self.start_datetime))
                     try_debug("job: '" + self.name + "', section: 'def try_start(self)'", DEBUG_SECTION_END)
@@ -512,6 +512,7 @@ class Job:
                     else:
                         try_debug("job: '" + self.name +
                                   "', section: 'if self.start_datetime <= now <= self.stop_datetime': return False")
+                        try_debug(str(self.start_datetime) + "<=" + str(now) + "<=" + str(self.stop_datetime))
                         try_debug("job: '" + self.name + "', section: 'def try_start(self)'", DEBUG_SECTION_END)
                         return False
                 else:
@@ -579,11 +580,11 @@ class Job:
                 if self.start_datetime is None:
                     start_dt = datetime.date.today()
                     try_debug("job: '" + self.name + "', section: 'if self.start_datetime is None'"
-                                                     ": start_dt:" + start_dt)
+                                                     ": start_dt:" + str(start_dt))
                 else:
                     start_dt = self.start_datetime
                     try_debug("job: '" + self.name + "', section: 'if self.start_datetime is None: else'"
-                                                     ": start_dt:" + start_dt)
+                                                     ": start_dt:" + str(start_dt))
 
                 if now > self.stop_datetime:
                     try_debug("job: '" + self.name + "', section: 'if now > self.stop_datetime'")
@@ -607,7 +608,7 @@ class Job:
                             stop_day = DOW[self.schedule["finish"]["day"]]
                             try_debug("job: '" + self.name +
                                       "', section: 'if isinstance(self.schedule['finish']['day'], str)'"
-                                      ": stop_day: " + stop_day)
+                                      ": stop_day: " + str(stop_day))
                             self.stop_datetime = next_weekday(
                                 datetime.datetime.combine(
                                     start_dt,
@@ -615,19 +616,28 @@ class Job:
                                 stop_day)
                             try_debug("job: '" + self.name +
                                       "', section: 'if isinstance(self.schedule['finish']['day'], str)'"
-                                      ": stop_datetime: " + self.stop_datetime)
+                                      ": stop_datetime: " + str(self.stop_datetime))
                             return True
                         else:
                             stop_day += self.schedule["finish"]["day"]
                             try_debug("job: '" + self.name +
                                       "', section: 'if isinstance(self.schedule['finish']['day'], str): else'"
-                                      ": stop_day: " + stop_day)
+                                      ": stop_day: " + str(stop_day))
+                    else:
+                        temp_stop_day_time = datetime.datetime(
+                            year=self.start_datetime.year,
+                            month=self.start_datetime.month,
+                            day=self.start_datetime.day,
+                            hour=stop_h_m[0],
+                            minute=stop_h_m[1])
+                        if temp_stop_day_time < self.start_datetime:
+                            stop_day = 1
 
                     self.stop_datetime = datetime.datetime.combine(
                         start_dt + timedelta(days=stop_day),
                         datetime.time(stop_h_m[0], stop_h_m[1], 0))
                     try_debug("job: '" + self.name + "', section: 'if 'day' in self.schedule['finish']'"
-                                                     ": stop_datetime: " + self.stop_datetime)
+                                                     ": stop_datetime: " + str(self.stop_datetime))
                     try_debug("job: '" + self.name + "', section: 'def try_stop(self)", DEBUG_SECTION_END)
                     return True
                 else:
@@ -985,6 +995,7 @@ class JobRep:
                 else:
                     try_debug("jobRep: '" + self.name +
                               "', section: 'if self.start_datetime <= now <= self.stop_datetime': return False")
+                    try_debug(str(self.start_datetime) + "<=" + str(now) + "<=" + str(self.stop_datetime))
                     try_debug("jobRep: '" + self.name + "', section: 'def try_start(self)", DEBUG_SECTION_END)
                     return False
             else:
@@ -1175,6 +1186,15 @@ class JobRep:
                             try_debug("jobRep: '" + self.name +
                                       "', section: 'if isinstance(self.schedule['finish']['day'], str): else': "
                                       "stop_day: " + str(stop_day))
+                    else:
+                        temp_stop_day_time = datetime.datetime(
+                            year=self.start_datetime.year,
+                            month=self.start_datetime.month,
+                            day=self.start_datetime.day,
+                            hour=stop_h_m[0],
+                            minute=stop_h_m[1])
+                        if temp_stop_day_time < self.start_datetime:
+                            stop_day = 1
 
                     self.stop_datetime = datetime.datetime.combine(
                         start_dt + timedelta(days=stop_day),
@@ -1634,3 +1654,4 @@ while True:
             if not jr.try_stop():
                 jr.try_repeat()
     time.sleep(1)
+
